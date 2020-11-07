@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  suggestic_app:
+    build:
+      context: .
+    ports:
+      - '8000:8000'
+    volumes:
+      - ./suggestic_app:/suggestic_app
+    command: >
+      sh -c "python tests/test_flatten.py"

@@ -4,7 +4,7 @@ import unittest
 
 sys.path.append(os.getcwd())
 
-from suggestic_app.utils.flatten import flatten_list
+from utils.flatten import flatten_list
 
 
 class FlattenListTestCase(unittest.TestCase):
