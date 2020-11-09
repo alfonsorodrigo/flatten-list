@@ -1,10 +1,14 @@
 import sys
 import os
 import unittest
+from unittest import TestCase
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 sys.path.append(os.getcwd())
 
 from utils.flatten import flatten_list
+from models.flatten import Flatten, Base
 
 
 class FlattenListTestCase(unittest.TestCase):
@@ -23,6 +27,36 @@ class FlattenListTestCase(unittest.TestCase):
         self.assertListEqual(response_flatten_list, [])
         self.assertEqual(type(response_flatten_list), list)
         self.assertEqual(sum(response_flatten_list), 0)
+
+
+class ORMCreateSchemaTestCase(TestCase):
+    def setUp(self) -> None:
+        self.engine = create_engine("sqlite:///:memory:")
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
+
+    def test_create_schema(self):
+        Base.metadata.create_all(self.engine)
+        self.assertTrue(Base.metadata.tables[Flatten.__tablename__].exists(self.engine))
+
+
+class ORMCreateExampleDataTestCase(TestCase):
+    def setUp(self) -> None:
+        self.input_list = [1, 2, [3, 4, [5, 6], 7], 8]
+        self.engine = create_engine("sqlite:///:memory:")
+        Base.metadata.create_all(self.engine)
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
+
+    def test_create_example(self):
+        response_flatten_list = flatten_list(self.input_list, [])
+        flatten_saved = Flatten(
+            items=str(self.input_list), result=str(response_flatten_list)
+        )
+        self.session.add(flatten_saved)
+        self.session.commit()
+        self.assertEqual(flatten_saved.result, "[1, 2, 3, 4, 5, 6, 7, 8]")
+        self.assertNotEqual(flatten_saved.items, flatten_saved.result)
 
 
 if __name__ == "__main__":
