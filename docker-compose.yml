@@ -5,8 +5,8 @@ services:
     build:
       context: .
     ports:
-      - '8000:8000'
+      - '5000:5000'
     volumes:
       - ./suggestic_app:/suggestic_app
     command: >
-      sh -c "python tests/test_flatten.py"
+      sh -c "python app.py"
